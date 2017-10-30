@@ -1,0 +1,43 @@
+version: '3'
+
+volumes:
+    database_data:
+        driver: local
+services:
+    php:
+        build:
+            context: ./docker/php/
+            args:
+                user_id: ${UID}
+                group_id: ${GID}
+                dev_host_ip: ${DEV_HOST_IP}
+        ports:
+            - 8080:80
+        expose:
+            - 9000
+        volumes:
+            - ./projects:/var/www/html
+        networks:
+            dev_net:
+                ipv4_address: 172.20.100.101
+    db:
+        image: mysql:latest
+        expose:
+            - 3306
+        volumes:
+            - database_data:/var/lib/mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: secret
+            MYSQL_DATABASE: project
+            MYSQL_USER: project
+            MYSQL_PASSWORD: project
+        networks:
+            dev_net:
+                ipv4_address: 172.20.100.102
+networks:
+    dev_net:
+        driver: bridge
+        ipam:
+            driver: default
+            config:
+              - subnet: 172.20.100.0/24

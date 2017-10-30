@@ -1,0 +1,4 @@
+.idea
+/projects/*
+!/projects/example/
+!/projects/tools/
