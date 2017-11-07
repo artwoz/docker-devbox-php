@@ -1,4 +1,7 @@
 .idea
 /projects/*
+/projects/symfony/*
 !/projects/example/
 !/projects/tools/
+!/projects/symfony/
+!/projects/symfony/example/

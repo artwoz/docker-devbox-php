@@ -1,6 +1,6 @@
 FROM php:7.1-apache
 
-MAINTAINER Artur Woźniczak <artur@wozniczak.pl>
+LABEL maintainer="wozniczak.pl"
 
 ARG user_id
 ARG group_id
@@ -13,7 +13,8 @@ RUN apt-get update && apt-get install -y \
     unzip \
     nodejs \
     ruby \
-    ruby-dev
+    ruby-dev \
+    zlib1g-dev
 
 RUN gem update --system \
     && gem install sass \
@@ -25,6 +26,7 @@ COPY ./php.ini /usr/local/etc/php/
 
 RUN docker-php-ext-install pdo_mysql \
     && docker-php-ext-install json \
+    && docker-php-ext-install zip \
     && pecl install xdebug \
     && echo "xdebug.remote_host=$dev_host_ip" >> /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "zend_extension="$(find / -name xdebug.so) >> /usr/local/etc/php/conf.d/xdebug.ini \
@@ -43,3 +45,15 @@ RUN curl -LsS https://symfony.com/installer -o /usr/local/bin/symfony \
 RUN usermod -u "$user_id" www-data \
     && groupmod -g "$group_id" www-data \
     && usermod -d /var/www/html www-data
+
+RUN curl -sL https://redirector.gvt1.com/edgedl/go/go1.9.2.linux-amd64.tar.gz >> /tmp/go.tar.gz \
+    && tar -C /usr/local -xzf /tmp/go.tar.gz \
+    && rm /tmp/go.tar.gz
+
+ENV PATH="${PATH}:/usr/local/go/bin"
+
+RUN mkdir -p /tmp/gocode \
+    && export GOPATH=/tmp/gocode \
+    && go get github.com/mailhog/mhsendmail \
+    && mv /tmp/gocode/bin/mhsendmail /usr/local/bin \
+    && rm -rf /tmp/gocode

@@ -11,10 +11,6 @@ services:
                 user_id: ${UID}
                 group_id: ${GID}
                 dev_host_ip: ${DEV_HOST_IP}
-        ports:
-            - 8080:80
-        expose:
-            - 9000
         volumes:
             - ./projects:/var/www/html
         networks:
@@ -34,6 +30,11 @@ services:
         networks:
             dev_net:
                 ipv4_address: 172.20.100.102
+    mailhog:
+        image: mailhog/mailhog
+        networks:
+            dev_net:
+                ipv4_address: 172.20.100.103
 networks:
     dev_net:
         driver: bridge
