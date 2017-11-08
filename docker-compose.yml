@@ -11,12 +11,14 @@ services:
                 user_id: ${UID}
                 group_id: ${GID}
                 dev_host_ip: ${DEV_HOST_IP}
+        expose:
+            - 9000
         volumes:
             - ./projects:/var/www/html
         networks:
             dev_net:
                 ipv4_address: 172.20.100.101
-    db:
+    mysql:
         image: mysql:latest
         expose:
             - 3306
@@ -32,6 +34,17 @@ services:
                 ipv4_address: 172.20.100.102
     mailhog:
         image: mailhog/mailhog
+# Workaround - based on: https://github.com/docksal/docksal/issues/142
+        expose:
+            - 80
+        environment:
+            - MH_API_BIND_ADDR=0.0.0.0:80
+            - MH_UI_BIND_ADDR=0.0.0.0:80
+            - MH_MAILDIR_PATH=/mailhog/log
+            - MH_STORAGE=maildir
+        user: root
+        volumes:
+            - ./mailhog:/mailhog
         networks:
             dev_net:
                 ipv4_address: 172.20.100.103

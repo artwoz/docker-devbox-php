@@ -5,3 +5,5 @@
 !/projects/tools/
 !/projects/symfony/
 !/projects/symfony/example/
+/mailhog/log/*
+!/mailhog/log/.gitkeep
