@@ -1,4 +1,4 @@
-FROM php:7.1-apache
+FROM php:7.0.25-apache
 
 LABEL maintainer="wozniczak.pl"
 
@@ -9,12 +9,20 @@ ARG dev_host_ip
 RUN curl -sL https://deb.nodesource.com/setup_8.x | bash -
 RUN apt-get update && apt-get install -y \
     git \
+    vim \
     zip \
     unzip \
     nodejs \
     ruby \
     ruby-dev \
-    zlib1g-dev
+    zlib1g-dev \
+    libfreetype6-dev \
+    libjpeg62-turbo-dev \
+    libpng-dev \
+    libmcrypt-dev \
+    libicu-dev \
+    libxslt1-dev \
+    expect
 
 RUN gem update --system \
     && gem install sass \
@@ -23,6 +31,15 @@ RUN gem update --system \
 COPY ./dev-local.conf /etc/apache2/sites-enabled/
 COPY ./xdebug.ini /usr/local/etc/php/conf.d/
 COPY ./php.ini /usr/local/etc/php/
+
+RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
+    && docker-php-ext-install gd \
+    && docker-php-ext-install iconv \
+    && docker-php-ext-install mcrypt \
+    && docker-php-ext-install intl \
+    && docker-php-ext-install zip \
+    && docker-php-ext-install xsl \
+    && docker-php-ext-install soap
 
 RUN docker-php-ext-install pdo_mysql \
     && docker-php-ext-install json \
@@ -57,3 +74,7 @@ RUN mkdir -p /tmp/gocode \
     && go get github.com/mailhog/mhsendmail \
     && mv /tmp/gocode/bin/mhsendmail /usr/local/bin \
     && rm -rf /tmp/gocode
+
+RUN curl -LsS -O https://files.magerun.net/n98-magerun2.phar \
+    && mv n98-magerun2.phar /usr/local/bin/ \
+    && chmod a+x /usr/local/bin/n98-magerun2.phar

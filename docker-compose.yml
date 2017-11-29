@@ -24,6 +24,7 @@ services:
             - 3306
         volumes:
             - database_data:/var/lib/mysql
+            - ./sql:/sql
         environment:
             MYSQL_ROOT_PASSWORD: secret
             MYSQL_DATABASE: project
